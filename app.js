@@ -41,8 +41,10 @@ async function doIt(q) {
     return out;
 };
 
+// Look at first query on the commandline (for speed):
 doIt({collection: '2GFF835P', item: 'WBR6SFD7'});
 
+// Make further queries via browser:
 const server = http.createServer();
 server.on('request', async (req, res) => {
     console.log(req.url);
