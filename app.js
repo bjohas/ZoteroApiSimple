@@ -18,13 +18,17 @@ async function apiCall(q) {
     };
     console.log(`item ${item}`);
     const response = await api().library('group', group).collections(q.collection).items(item).top().get(options);
+    // const response = await api().library('group', group).items(item).get(options);
     const items = response.getData();
     return items;
 }
 
 async function doIt(q) {
     var out = "";
-    out += `${hostname}:${port}/?collection=${q.collection}&item=${q.item}`;
+    out += `${hostname}:${port}/?collection=${q.collection}&item=${q.item}\n`;
+    out += `https://api.zotero.org/groups/${group}/collectios/${q.collection}/topItems\n`;
+    out += `https://api.zotero.org/groups/${group}/items/${q.item}\n`;
+    out += `https://api.zotero.org/groups/${group}/items/${q.item}/children\n`;
     const items = await apiCall(q);
     out += items.length + "\n";
     for(var i=0; i<items.length; i++) {
