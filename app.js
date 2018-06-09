@@ -4,14 +4,15 @@ const hostname = '127.0.0.1';
 const port = 3000;
 const api = require('zotero-api-client');
 var url = require('url');
-const group = 2129771
+const group = 2129771;
 
 async function apiCall(q) {
     console.log('calling: '+q.collection + " " + q.item);
-    const options = { limit: 10 };
+    var options = { limit: 10 };
     var item = null;
     if (q.item) {
 	item = q.item;
+	options.item = q.item;
     } else {
 	item = '';
     };
