@@ -3,24 +3,50 @@ const http = require('http');
 const hostname = '127.0.0.1';
 const port = 3000;
 const api = require('zotero-api-client');
-var items = null;
+var url = require('url');
+const group = 2129771
 
-async function asyncCall() {
-    console.log('calling');
-    const options = { limit: 1000 };
-    const response = await api().library('group', 2129771).collections('2GFF835P').items().top().get(options);
-    items = response.getData();
-    console.log(items.map(i => i.title));
-    // return items;
+async function apiCall(q) {
+    console.log('calling: '+q.collection + " " + q.item);
+    const options = { limit: 10 };
+    var item = null;
+    if (q.item) {
+	item = q.item;
+    } else {
+	item = '';
+    };
+    console.log(`item ${item}`);
+    const response = await api().library('group', group).collections(q.collection).items(item).top().get(options);
+    const items = response.getData();
+    return items;
 }
 
-asyncCall();
+async function doIt(q) {
+    var out = "";
+    out += `${hostname}:${port}/?collection=${q.collection}&item=${q.item}`;
+    const items = await apiCall(q);
+    out += items.length + "\n";
+    for(var i=0; i<items.length; i++) {
+	if (items[i]) {
+	    out += items[i].key + ": " + items[i].title + "\n";
+	};
+    };
+    out += "END";
+    console.log(out);
+    return out;
+};
 
-const server = http.createServer((req, res) => {
-    res.statusCode = 200;
+doIt({collection: '2GFF835P', item: 'WBR6SFD7'});
+
+const server = http.createServer();
+server.on('request', async (req, res) => {
+    console.log(req.url);
     res.setHeader('Content-Type', 'text/plain');
-    console.log("Hello");
-    res.end('Hello World\n' + items.map(i => i.title));
+    res.statusCode = 200;
+    var q = url.parse(req.url, true).query;
+    //console.log(items.map(i => i.title));
+    var out = await doIt(q);
+    res.end(out);
 });
 
 server.listen(port, hostname, () => {
