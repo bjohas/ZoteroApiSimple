@@ -9,7 +9,7 @@ const group = 2129771;
 async function apiCall(q) {
     console.log('calling: '+q.collection + " " + q.item);
     var options = { limit: 10, include: "bib,citation,data,coins,mods,rdf_dc,ris", format: "json", style: "apa" };
-    var item = null;
+    var item;
     if (q.item) {
 	item = q.item;
 	options.itemKey = q.item;
@@ -24,13 +24,13 @@ async function apiCall(q) {
     };   
     console.log(`collection ${collection}, item ${item}`);
     // You cannot call collections() without an argument it seems, hence:
+    var response = null;
     if (collection != null) {
 	response = await api().library('group', group).collections(collection).items().top().get(options);
     } else {
 	response = await api().library('group', group).items().top().get(options);
     };
-    // const response = await api().library('group', group).items(item).get(options);
-    // console.log(`Get`);
+    // RawApiResponse ??
     const items = response.getData();
     return items;
 }
@@ -80,4 +80,7 @@ server.on('request', async (req, res) => {
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
 });
+
+
+
 
